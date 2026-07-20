@@ -1,0 +1,45 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: '部署环境'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: '版本号'
+        required: false
+        default: 'latest'
+        type: string
+      dry_run:
+        description: '仅模拟运行（不实际部署）'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Show inputs
+        run: |
+          echo "环境: ${{ github.event.inputs.environment }}"
+          echo "版本: ${{ github.event.inputs.version }}"
+          echo "模拟运行: ${{ github.event.inputs.dry_run }}"
+
+      - name: Build
+        run: |
+          echo "正在构建版本 ${{ github.event.inputs.version }}..."
+
+      - name: Deploy
+        if: ${{ github.event.inputs.dry_run == false }}
+        run: |
+          echo "正在部署到 ${{ github.event.inputs.environment }}..."
